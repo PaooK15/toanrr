@@ -105,7 +105,7 @@
           <i class="fa-solid fa-table-cells-large mr-1.5"></i>12 Ô Cửa Bí Mật
         </button>
         <button onclick="switchTab('wheel')" id="tab-btn-wheel" class="px-4 py-2 rounded-lg text-sm font-bold transition-all text-[#EEF2F7] hover:text-white">
-          <i class="fa-solid fa-dharmachakra mr-1.5"></i>Vòng Quay Gọi Tên
+          <i class="fa-solid fa-dharmachakra mr-1.5"></i>Vòng Quay Điểm Số
         </button>
         <button onclick="switchTab('simulator')" id="tab-btn-simulator" class="px-4 py-2 rounded-lg text-sm font-bold transition-all text-[#EEF2F7] hover:text-white">
           <i class="fa-solid fa-box-open mr-1.5"></i>Thử Thách Dirichlet
@@ -212,11 +212,11 @@
       </div>
     </section>
 
-    <!-- TAB 2: VÒNG QUAY MAY MẮN / GỌI TÊN (LUCKY WHEEL) -->
+    <!-- TAB 2: VÒNG QUAY MAY MẮN / GỌI TÊN (LUCKY WHEEL + TỰ LỰA CHỌN ĐIỂM SỐ) -->
     <section id="tab-wheel" class="hidden bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-[#4A78C2]/20">
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         <!-- Left Column: Wheel Canvas -->
-        <div class="lg:col-span-7 flex flex-col items-center justify-center relative">
+        <div class="lg:col-span-6 flex flex-col items-center justify-center relative py-2">
           <div class="relative w-[320px] h-[320px] sm:w-[400px] sm:h-[400px] flex items-center justify-center">
             <!-- Pointer Arrow -->
             <div class="absolute -top-3 z-20 text-[#1F3F73] drop-shadow-md text-4xl">
@@ -229,36 +229,86 @@
           </div>
         </div>
 
-        <!-- Right Column: Wheel Controls & Result -->
-        <div class="lg:col-span-5 flex flex-col gap-5">
+        <!-- Right Column: Wheel Controls, Direct Selection & Custom Slice Editor -->
+        <div class="lg:col-span-6 flex flex-col gap-4">
+          <!-- Box Kết Quả Vòng Quay -->
           <div class="bg-[#EEF2F7] rounded-2xl p-5 border border-[#4A78C2]/20">
-            <span class="text-xs font-bold uppercase tracking-wider text-[#4A78C2]">KẾT QUẢ VÒNG QUAY</span>
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold uppercase tracking-wider text-[#4A78C2]">KẾT QUẢ VÒNG QUAY</span>
+              <span id="wheel-active-team-badge" class="text-xs font-extrabold px-2.5 py-0.5 rounded-md bg-white text-[#1F3F73] border border-[#4A78C2]/30">
+                Đội hiện tại: Đội Truy Hồi
+              </span>
+            </div>
             <h3 id="wheel-result-title" class="text-2xl font-extrabold text-[#1F3F73] mt-1">Sẵn sàng quay!</h3>
             <p id="wheel-result-desc" class="text-sm text-[#1A1A1A]/80 mt-1">
-              Nhấn nút "QUAY!" để chọn ngẫu nhiên phần thưởng điểm hoặc thử thách cho đội đang tới lượt.
+              Nhấn nút "QUAY!" trên vòng quay hoặc tự chọn trực tiếp mức điểm ở bên dưới.
             </p>
             <div id="wheel-action-box" class="mt-4 hidden">
-              <button onclick="applyWheelReward()" id="wheel-apply-btn" class="w-full py-2.5 px-4 rounded-xl bg-[#1F3F73] hover:bg-[#4A78C2] text-white font-bold text-sm transition">
+              <button onclick="applyWheelReward()" id="wheel-apply-btn" class="w-full py-2.5 px-4 rounded-xl bg-[#1F3F73] hover:bg-[#4A78C2] text-white font-bold text-sm transition shadow">
                 Áp dụng ngay cho Đội hiện tại
               </button>
             </div>
           </div>
 
-          <div class="bg-white rounded-2xl p-5 border border-gray-200">
-            <h4 class="font-bold text-[#1F3F73] text-base mb-2 flex items-center gap-2">
-              <i class="fa-solid fa-users-viewfinder text-[#4A78C2]"></i> Chế độ quay:
-            </h4>
-            <div class="grid grid-cols-2 gap-2.5 mb-4">
-              <button onclick="setWheelMode('mystery')" id="wheel-mode-mystery" class="py-2.5 px-3 rounded-xl text-xs font-bold bg-[#1F3F73] text-white transition">
-                🎁 Vòng Quay Điểm Thưởng
-              </button>
-              <button onclick="setWheelMode('teams')" id="wheel-mode-teams" class="py-2.5 px-3 rounded-xl text-xs font-bold bg-[#EEF2F7] text-[#1F3F73] transition">
-                🎯 Chọn Đội Ngẫu Nhiên
-              </button>
+          <!-- Chế độ quay -->
+          <div class="bg-white rounded-2xl p-5 border border-gray-200 space-y-4">
+            <div>
+              <h4 class="font-bold text-[#1F3F73] text-sm uppercase tracking-wider mb-2.5 flex items-center gap-2">
+                <i class="fa-solid fa-sliders text-[#4A78C2]"></i> 1. Chế độ vòng quay:
+              </h4>
+              <div class="grid grid-cols-2 gap-2.5">
+                <button onclick="setWheelMode('mystery')" id="wheel-mode-mystery" class="py-2.5 px-3 rounded-xl text-xs font-bold bg-[#1F3F73] text-white transition">
+                  🎁 Vòng Quay Điểm Số
+                </button>
+                <button onclick="setWheelMode('teams')" id="wheel-mode-teams" class="py-2.5 px-3 rounded-xl text-xs font-bold bg-[#EEF2F7] text-[#1F3F73] transition">
+                  🎯 Chọn Đội Ngẫu Nhiên
+                </button>
+              </div>
             </div>
-            <p class="text-xs text-gray-600 leading-relaxed">
-              Sử dụng vòng quay khi một đội trả lời đúng câu hỏi khó hoặc khi nhóm thuyết trình muốn chọn ngẫu nhiên một đội trong lớp lên trả lời!
-            </p>
+
+            <!-- Khu vực Tự Lựa Chọn Điểm Số (Chỉ hiện khi ở chế độ Vòng Quay Điểm Số) -->
+            <div id="custom-wheel-settings" class="space-y-4 pt-3 border-t border-gray-100">
+              <!-- Tự bấm chọn nhanh mức điểm không cần quay -->
+              <div>
+                <label class="text-xs font-extrabold uppercase text-[#1F3F73] block mb-2">
+                  <i class="fa-solid fa-hand-pointer text-[#4A78C2] mr-1"></i> 2. Tự lựa chọn nhanh điểm số (Áp dụng ngay hoặc chọn trước):
+                </label>
+                <div id="wheel-direct-select-list" class="flex flex-wrap gap-2">
+                  <!-- Nút chọn trực tiếp từng ô điểm được tạo bởi JS -->
+                </div>
+              </div>
+
+              <!-- Tự tùy chỉnh các ô điểm trên vòng quay -->
+              <div class="bg-[#EEF2F7]/70 p-3.5 rounded-xl border border-[#4A78C2]/20 space-y-2.5">
+                <div class="flex items-center justify-between">
+                  <label class="text-xs font-extrabold uppercase text-[#1F3F73]">
+                    <i class="fa-solid fa-pen-ruler text-[#4A78C2] mr-1"></i> 3. Tự chỉnh sửa các ô điểm trên vòng quay:
+                  </label>
+                  <button onclick="resetDefaultWheelSlices()" class="text-[11px] font-bold text-[#4A78C2] hover:underline">
+                    Khôi phục mặc định
+                  </button>
+                </div>
+                <p class="text-[11px] text-gray-600">
+                  Nhập các mức điểm cách nhau bởi dấu phẩy (có thể nhập số âm để trừ điểm, ví dụ: <code class="bg-white px-1 py-0.5 rounded font-bold text-[#1F3F73]">50, 100, 150, 200, -50, 300</code>):
+                </p>
+                <div class="flex gap-2">
+                  <input id="custom-wheel-input" type="text" value="100, 150, 50, 50, 200, 100" class="flex-grow px-3 py-2 rounded-xl bg-white border border-gray-300 text-xs font-bold text-[#1F3F73] focus:outline-none focus:border-[#4A78C2]" placeholder="VD: 50, 100, 200, -50, 300">
+                  <button onclick="updateCustomWheelSlices()" class="px-4 py-2 rounded-xl bg-[#1F3F73] hover:bg-[#4A78C2] text-white text-xs font-extrabold transition shrink-0 shadow-sm">
+                    Cập nhật vòng quay
+                  </button>
+                </div>
+
+                <!-- Thêm nhanh 1 ô tùy ý -->
+                <div class="flex flex-wrap items-center gap-2 pt-1">
+                  <span class="text-[11px] font-bold text-gray-600">Thêm nhanh ô:</span>
+                  <input id="single-slice-label" type="text" placeholder="Tên ô (VD: Siêu cấp)" class="px-2.5 py-1.5 rounded-lg bg-white border border-gray-300 text-xs font-semibold w-36 focus:outline-none focus:border-[#4A78C2]">
+                  <input id="single-slice-points" type="number" step="10" value="250" placeholder="Điểm" class="px-2.5 py-1.5 rounded-lg bg-white border border-gray-300 text-xs font-bold w-20 text-[#1F3F73] focus:outline-none focus:border-[#4A78C2]">
+                  <button onclick="addSingleWheelSlice()" class="px-3 py-1.5 rounded-lg bg-[#4A78C2] hover:bg-[#1F3F73] text-white text-xs font-bold transition">
+                    <i class="fa-solid fa-plus mr-1"></i>Thêm ô
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -433,11 +483,11 @@
         </li>
         <li class="flex items-start gap-2.5">
           <span class="w-6 h-6 rounded-full bg-[#1F3F73] text-white font-bold text-xs flex items-center justify-center shrink-0 mt-0.5">3</span>
-          <span>Ẩn dưới 12 ô cửa có <strong>3 Ô Cửa May Mắn (Nhân đôi điểm x2)</strong>. Trả lời đúng được cộng toàn bộ điểm, trả lời sai không bị trừ điểm và đội khác có thể bấm nút cộng điểm nếu cứu trợ thành công!</span>
+          <span>Ẩn dưới 12 ô cửa có <strong>3 Ô Cửa May Mắn (Nhân đôi điểm x2)</strong>. Trả lời đúng được cộng toàn bộ điểm của câu đó; <strong>trả lời sai sẽ bị trừ luôn số điểm của câu hỏi đó!</strong></span>
         </li>
         <li class="flex items-start gap-2.5">
           <span class="w-6 h-6 rounded-full bg-[#4A78C2] text-white font-bold text-xs flex items-center justify-center shrink-0 mt-0.5">4</span>
-          <span>Sử dụng thêm tab <strong>Vòng Quay Gọi Tên</strong> để tăng kịch tính hoặc tab <strong>Thử Thách Dirichlet</strong> để minh họa trực quan với cả lớp.</span>
+          <span>Ở tab <strong>Vòng Quay Điểm Số</strong>, bạn có thể quay ngẫu nhiên, tự bấm chọn nhanh mức điểm hoặc tự chỉnh sửa các ô điểm trên vòng quay.</span>
         </li>
       </ul>
       <div class="pt-2 text-right">
@@ -817,6 +867,7 @@
           if (e.target.closest('button')) return;
           activeTeamIndex = idx;
           renderScoreboard();
+          updateWheelActiveTeamBadge();
         };
 
         card.innerHTML = `
@@ -841,6 +892,14 @@
       });
 
       document.getElementById('progress-counter').textContent = `${completedTiles.size}/${QUESTIONS.length}`;
+      updateWheelActiveTeamBadge();
+    }
+
+    function updateWheelActiveTeamBadge() {
+      const badge = document.getElementById('wheel-active-team-badge');
+      if (badge && teams[activeTeamIndex]) {
+        badge.textContent = `Đội hiện tại: ${teams[activeTeamIndex].name}`;
+      }
     }
 
     function adjustScore(teamIdx, delta) {
@@ -875,7 +934,7 @@
         tile.innerHTML = `
           <span class="text-xs font-extrabold uppercase tracking-widest opacity-75 mb-1">Ô cửa số ${idx + 1}</span>
           <span class="text-3xl font-extrabold tracking-tight">${isDone ? '<i class="fa-solid fa-check text-2xl"></i>' : q.points}</span>
-          <span class="text-[11px] font-bold mt-1 opacity-80">${isDone ? 'Đã giải quyết' : 'Điểm thưởng'}</span>
+          <span class="text-[11px] font-bold mt-1 opacity-80">${isDone ? 'Đã giải quyết' : 'Điểm câu hỏi'}</span>
         `;
 
         if (q.category === 1) col1.appendChild(tile);
@@ -998,7 +1057,6 @@
     function useFiftyFifty() {
       if (!currentQuestion || questionAnswered) return;
       const wrongIndices = [0, 1, 2, 3].filter(i => i !== currentQuestion.correct);
-      // Shuffle wrong indices and hide 2
       wrongIndices.sort(() => Math.random() - 0.5);
       const toHide = wrongIndices.slice(0, 2);
       toHide.forEach(idx => {
@@ -1022,6 +1080,7 @@
       const q = currentQuestion;
       const isCorrect = selectedIndex === q.correct;
       const effectivePoints = q.isLucky ? q.points * 2 : q.points;
+      const currentTeamName = teams[activeTeamIndex].name;
 
       // Highlight buttons
       [0, 1, 2, 3].forEach(idx => {
@@ -1051,23 +1110,25 @@
         expBox.className = "rounded-2xl p-5 border-2 border-emerald-500 bg-emerald-50/70";
         expIcon.className = "w-9 h-9 rounded-xl bg-emerald-600 flex items-center justify-center text-white text-lg shrink-0 mt-0.5";
         expIcon.innerHTML = '<i class="fa-solid fa-check"></i>';
-        expTitle.textContent = `Chính xác! Chúc mừng ${teams[activeTeamIndex].name}!`;
+        expTitle.textContent = `Chính xác! Chúc mừng ${currentTeamName}!`;
         expTitle.className = "font-extrabold text-base text-emerald-900";
-        pointsAwarded.textContent = `+${effectivePoints} ĐIỂM CHO ${teams[activeTeamIndex].name.toUpperCase()}`;
+        pointsAwarded.textContent = `+${effectivePoints} ĐIỂM CHO ${currentTeamName.toUpperCase()}`;
         playCorrectSound();
         triggerConfetti();
       } else {
+        // TRẢ LỜI SAI -> TRỪ LUÔN SỐ ĐIỂM CỦA CÂU HỎI ĐÓ
+        teams[activeTeamIndex].score -= effectivePoints;
         expBox.className = "rounded-2xl p-5 border-2 border-red-400 bg-red-50/70";
         expIcon.className = "w-9 h-9 rounded-xl bg-red-600 flex items-center justify-center text-white text-lg shrink-0 mt-0.5";
         expIcon.innerHTML = '<i class="fa-solid fa-xmark"></i>';
-        expTitle.textContent = "Chưa chính xác! Hãy xem giải thích chi tiết bên dưới:";
+        expTitle.textContent = `Chưa chính xác! ${currentTeamName} bị trừ ${effectivePoints} điểm của câu này!`;
         expTitle.className = "font-extrabold text-base text-red-900";
-        pointsAwarded.textContent = `KHÔNG CỘNG ĐIỂM (CÓ THỂ DÙNG NÚT +50 TRÊN BẢNG ĐIỂM CHO ĐỘI CỨU TRỢ)`;
+        pointsAwarded.textContent = `-${effectivePoints} ĐIỂM ĐỐI VỚI ${currentTeamName.toUpperCase()} (CÓ THỂ DÙNG NÚT +50 CHO ĐỘI CỨU TRỢ)`;
         playWrongSound();
       }
 
       completedTiles.add(q.id);
-      // Automatically rotate to next team for fairness
+      // Chuyển lượt sang đội tiếp theo
       activeTeamIndex = (activeTeamIndex + 1) % teams.length;
       renderScoreboard();
       renderBoard();
@@ -1110,26 +1171,31 @@
           btn.className = "px-4 py-2 rounded-lg text-sm font-bold transition-all text-[#EEF2F7] hover:text-white";
         }
       });
-      if (tabName === 'wheel') drawWheel();
+      if (tabName === 'wheel') {
+        renderDirectSelectButtons();
+        drawWheel();
+      }
       if (tabName === 'simulator') updateSimulatorParams();
     }
 
     // ==========================================
-    // 6. LUCKY WHEEL (VÒNG QUAY MAY MẮN)
+    // 6. LUCKY WHEEL (VÒNG QUAY ĐIỂM SỐ + TỰ LỰA CHỌN)
     // ==========================================
     let wheelMode = 'mystery';
     let wheelRotation = 0;
     let isSpinning = false;
     let pendingWheelDelta = 0;
 
-    const MYSTERY_SLICES = [
+    const DEFAULT_MYSTERY_SLICES = [
       { label: "+100 Điểm", delta: 100, color: "#1F3F73", desc: "Phần thưởng may mắn +100 điểm cho đội hiện tại!" },
-      { label: "Nhân đôi lượt", delta: 150, color: "#4A78C2", desc: "Siêu may mắn! Cộng ngay +150 điểm thưởng nóng!" },
+      { label: "Nhân đôi +150", delta: 150, color: "#4A78C2", desc: "Siêu may mắn! Cộng ngay +150 điểm thưởng nóng!" },
       { label: "+50 Điểm", delta: 50, color: "#1F3F73", desc: "Khích lệ tinh thần +50 điểm!" },
-      { label: "Tràng pháo tay", delta: 50, color: "#4A78C2", desc: "Cả lớp vỗ tay thật lớn và tặng đội +50 điểm!" },
+      { label: "Pháo tay +50", delta: 50, color: "#4A78C2", desc: "Cả lớp vỗ tay thật lớn và tặng đội +50 điểm!" },
       { label: "+200 Điểm!", delta: 200, color: "#1F3F73", desc: "Giải đặc biệt! Cộng ngay +200 điểm!" },
       { label: "Chia sẻ +100", delta: 100, color: "#4A78C2", desc: "Tinh thần đồng đội! Cộng +100 điểm!" }
     ];
+
+    let mysterySlices = [...DEFAULT_MYSTERY_SLICES];
 
     function setWheelMode(mode) {
       wheelMode = mode;
@@ -1140,7 +1206,138 @@
         ? "py-2.5 px-3 rounded-xl text-xs font-bold bg-[#1F3F73] text-white transition"
         : "py-2.5 px-3 rounded-xl text-xs font-bold bg-[#EEF2F7] text-[#1F3F73] transition";
       document.getElementById('wheel-action-box').classList.add('hidden');
+
+      const customSettings = document.getElementById('custom-wheel-settings');
+      if (mode === 'mystery') {
+        customSettings.classList.remove('hidden');
+      } else {
+        customSettings.classList.add('hidden');
+      }
+
+      renderDirectSelectButtons();
       drawWheel();
+    }
+
+    function renderDirectSelectButtons() {
+      const container = document.getElementById('wheel-direct-select-list');
+      if (!container) return;
+      container.innerHTML = '';
+
+      mysterySlices.forEach((slice, idx) => {
+        const wrapper = document.createElement('div');
+        wrapper.className = "inline-flex items-center rounded-xl overflow-hidden border border-[#4A78C2]/40 bg-white shadow-sm";
+
+        const selectBtn = document.createElement('button');
+        selectBtn.onclick = () => selectWheelSliceDirectly(idx);
+        selectBtn.className = "px-3 py-1.5 text-xs font-extrabold text-[#1F3F73] hover:bg-[#1F3F73] hover:text-white transition flex items-center gap-1";
+        selectBtn.title = "Bấm để chọn ngay mức điểm này";
+        selectBtn.innerHTML = `<span>${slice.label}</span>`;
+
+        const delBtn = document.createElement('button');
+        delBtn.onclick = () => removeWheelSlice(idx);
+        delBtn.className = "px-2 py-1.5 text-xs text-gray-400 hover:bg-red-500 hover:text-white transition border-l border-gray-200";
+        delBtn.title = "Xóa ô này khỏi vòng quay";
+        delBtn.innerHTML = `<i class="fa-solid fa-xmark"></i>`;
+
+        wrapper.appendChild(selectBtn);
+        if (mysterySlices.length > 2) {
+          wrapper.appendChild(delBtn);
+        }
+        container.appendChild(wrapper);
+      });
+    }
+
+    function selectWheelSliceDirectly(idx) {
+      const chosen = mysterySlices[idx];
+      if (!chosen) return;
+
+      // Xoay nhẹ vòng quay tới đúng ô được chọn để trực quan
+      const numSlices = mysterySlices.length;
+      const arc = (2 * Math.PI) / numSlices;
+      wheelRotation = (3 * Math.PI / 2) - (idx * arc) - (arc / 2);
+      drawWheel();
+
+      document.getElementById('wheel-result-title').textContent = `Đã chọn: ${chosen.label}`;
+      document.getElementById('wheel-result-desc').textContent = chosen.desc;
+      pendingWheelDelta = chosen.delta;
+
+      const actionBox = document.getElementById('wheel-action-box');
+      const applyBtn = document.getElementById('wheel-apply-btn');
+      const sign = chosen.delta >= 0 ? `+${chosen.delta}` : `${chosen.delta}`;
+      applyBtn.textContent = `Áp dụng ${sign} điểm cho ${teams[activeTeamIndex].name}`;
+      actionBox.classList.remove('hidden');
+      playTickSound();
+    }
+
+    function removeWheelSlice(idx) {
+      if (mysterySlices.length <= 2) return;
+      mysterySlices.splice(idx, 1);
+      syncCustomInputFromSlices();
+      renderDirectSelectButtons();
+      drawWheel();
+    }
+
+    function addSingleWheelSlice() {
+      const labelInput = document.getElementById('single-slice-label');
+      const pointsInput = document.getElementById('single-slice-points');
+      const pts = parseInt(pointsInput.value, 10);
+      if (isNaN(pts)) return;
+
+      const sign = pts >= 0 ? `+${pts}` : `${pts}`;
+      const customName = labelInput.value.trim();
+      const label = customName ? `${customName} (${sign})` : `${sign} Điểm`;
+      const color = mysterySlices.length % 2 === 0 ? "#1F3F73" : "#4A78C2";
+      const desc = pts >= 0
+        ? `Phần thưởng tự chọn ${sign} điểm cho đội hiện tại!`
+        : `Thử thách trừ ${pts} điểm đối với đội hiện tại!`;
+
+      mysterySlices.push({ label, delta: pts, color, desc });
+      labelInput.value = '';
+      syncCustomInputFromSlices();
+      renderDirectSelectButtons();
+      drawWheel();
+      playTickSound();
+    }
+
+    function updateCustomWheelSlices() {
+      const raw = document.getElementById('custom-wheel-input').value;
+      const numbers = raw
+        .split(',')
+        .map(s => parseInt(s.trim(), 10))
+        .filter(n => !isNaN(n));
+
+      if (numbers.length < 2) return;
+
+      mysterySlices = numbers.map((pts, i) => {
+        const sign = pts >= 0 ? `+${pts}` : `${pts}`;
+        return {
+          label: `${sign} Điểm`,
+          delta: pts,
+          color: i % 2 === 0 ? "#1F3F73" : "#4A78C2",
+          desc: pts >= 0
+            ? `Cộng ${sign} điểm cho đội đang tới lượt!`
+            : `Trừ ${Math.abs(pts)} điểm của đội đang tới lượt!`
+        };
+      });
+
+      renderDirectSelectButtons();
+      drawWheel();
+      playTickSound();
+    }
+
+    function resetDefaultWheelSlices() {
+      mysterySlices = [...DEFAULT_MYSTERY_SLICES];
+      syncCustomInputFromSlices();
+      renderDirectSelectButtons();
+      drawWheel();
+      playTickSound();
+    }
+
+    function syncCustomInputFromSlices() {
+      const input = document.getElementById('custom-wheel-input');
+      if (input) {
+        input.value = mysterySlices.map(s => s.delta).join(', ');
+      }
     }
 
     function getWheelItems() {
@@ -1152,7 +1349,7 @@
           desc: `Xin mời ${t.name} cử đại diện trả lời câu hỏi tiếp theo!`
         }));
       }
-      return MYSTERY_SLICES;
+      return mysterySlices;
     }
 
     function drawWheel() {
@@ -1171,7 +1368,7 @@
         ctx.beginPath();
         ctx.moveTo(radius, radius);
         ctx.arc(radius, radius, radius - 4, angle, angle + arc);
-        ctx.fillStyle = item.color;
+        ctx.fillStyle = i % 2 === 0 ? "#1F3F73" : "#4A78C2";
         ctx.fill();
         ctx.lineWidth = 2;
         ctx.strokeStyle = "#FFFFFF";
@@ -1222,23 +1419,26 @@
           requestAnimationFrame(animateWheel);
         } else {
           isSpinning = false;
-          // Pointer is at top (-Math.PI / 2 or 3*Math.PI/2)
           const normalizedAngle = ((3 * Math.PI / 2 - (wheelRotation % (2 * Math.PI))) + 2 * Math.PI) % (2 * Math.PI);
           const winningIndex = Math.floor(normalizedAngle / arc) % numSlices;
           const winner = items[winningIndex];
 
           document.getElementById('wheel-result-title').textContent = winner.label;
           document.getElementById('wheel-result-desc').textContent = winner.desc;
-          playCorrectSound();
 
           if (wheelMode === 'teams') {
+            playCorrectSound();
             activeTeamIndex = winner.teamIndex;
             renderScoreboard();
           } else {
+            if (winner.delta >= 0) playCorrectSound();
+            else playWrongSound();
+
             pendingWheelDelta = winner.delta;
             const actionBox = document.getElementById('wheel-action-box');
             const applyBtn = document.getElementById('wheel-apply-btn');
-            applyBtn.textContent = `Cộng +${winner.delta} điểm cho ${teams[activeTeamIndex].name}`;
+            const sign = winner.delta >= 0 ? `+${winner.delta}` : `${winner.delta}`;
+            applyBtn.textContent = `Áp dụng ${sign} điểm cho ${teams[activeTeamIndex].name}`;
             actionBox.classList.remove('hidden');
           }
         }
@@ -1248,10 +1448,14 @@
     }
 
     function applyWheelReward() {
-      if (pendingWheelDelta) {
+      if (pendingWheelDelta !== 0) {
         teams[activeTeamIndex].score += pendingWheelDelta;
-        playCorrectSound();
-        triggerConfetti();
+        if (pendingWheelDelta > 0) {
+          playCorrectSound();
+          triggerConfetti();
+        } else {
+          playWrongSound();
+        }
         renderScoreboard();
         document.getElementById('wheel-action-box').classList.add('hidden');
       }
@@ -1461,6 +1665,7 @@
     window.onload = function () {
       renderScoreboard();
       renderBoard();
+      renderDirectSelectButtons();
       updateSimulatorParams();
     };
   </script>
